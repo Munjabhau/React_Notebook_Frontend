@@ -36,15 +36,7 @@ const NoteState = (props) => {
     });
 
     console.log("Adding a new note");
-    const note = {
-      _id: "641ec0e81da7cc06fa4f47eabc",
-      user: "641d660869d9742a39395935",
-      title: title,
-      description: description,
-      tag: tag,
-      date: "2023-03-25T09:37:44.063Z",
-      __v: 0,
-    };
+    const note = await response.json();
     setNotes(notes.concat(note));
   };
 
@@ -72,23 +64,27 @@ const NoteState = (props) => {
   const editNote =async (id, title, description, tag) => {
     //API call
     const response=await fetch(`${host}/api/notes/updatenote/${id}`,{
-      method:'POST',
+      method:'PUT',
       headers:{
         'content-Type':'application/json',
         'auth-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQxZDY2MDg2OWQ5NzQyYTM5Mzk1OTM1In0sImlhdCI6MTY3OTY2OTAyMH0.teKR9J3-WzrcEdYJ4HFMY6ItzAGkPlh54N0Xz9mZH9o'
       },
       body:JSON.stringify({title,description,tag})
     });
-    const json= response.json();
+    const json= await response.json();
+
+    let newNotes=JSON.parse(JSON.stringify(notes))
     //logic to edit in client
-    for (let index = 0; index < notes.length; index++) {
+    for (let index = 0; index < newNotes.length; index++) {
       const element = notes[index];
       if (element._id === id) {
-        element.title = title;
-        element.description = description;
-        element.tag = tag;
+        newNotes[index].title = title;
+        newNotes[index].description = description;
+        newNotes[index].tag = tag;
+        break;
       }
     }
+    setNotes(newNotes);
   };
   return (
     <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote ,getNotes}}>

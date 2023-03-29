@@ -5,20 +5,22 @@ import Noteitem from "./Noteitem";
 
 const Notes = () => {
   const context = useContext(noteContext);
-  const { notes, getNotes } = context;
+  const { notes, getNotes,editNote } = context;
   useEffect(() => {
     getNotes();
   }, []);
   const ref = useRef(null);
-  const [note,setNote]=useState({etitle:"",edescription:"",etag:""})
+  const refClose = useRef(null);
+  const [note,setNote]=useState({id:"",etitle:"",edescription:"",etag:""})
   
   const updateNote = (currentNote) => {
     ref.current.click();
-    setNote({etitle:currentNote.title,edescription:currentNote.description,etag:currentNote.tag});
+    setNote({id:currentNote._id,etitle:currentNote.title,edescription:currentNote.description,etag:currentNote.tag});
   };
   const handleClick=(e)=>{
     console.log("Updating the notes....",note);
-    e.preventDefault();
+    editNote(note.id,note.etitle,note.edescription,note.etag)
+    refClose.current.click();
 }
 const onChange=(e)=>{
     setNote({...note,[e.target.name]:e.target.value})
@@ -71,6 +73,8 @@ const onChange=(e)=>{
             value={note.etitle}
             aria-describedby="emailHelp"
             onChange={onChange}
+            minLength={5}
+            required
           />
         </div>
         <div className="form-group">
@@ -82,6 +86,8 @@ const onChange=(e)=>{
             name="edescription"
             value={note.edescription}
             onChange={onChange}
+            minLength={5}
+            required
           />
         </div>
         <div className="form-group">
@@ -98,14 +104,15 @@ const onChange=(e)=>{
       </form>
             </div>
             <div className="modal-footer">
-              <button
+              <button              
+              ref={refClose}
                 type="button"
                 className="btn btn-secondary"
                 data-dismiss="modal"
               >
                 Close
               </button>
-              <button onClick={handleClick} type="button" className="btn btn-primary">
+              <button disabled={note.etitle.length<5||note.edescription.length<5} onClick={handleClick} type="button" className="btn btn-primary">
                 Update Note
               </button>
             </div>
@@ -114,6 +121,7 @@ const onChange=(e)=>{
       </div>
       <div className="row my-3">
         <h2>Your Note</h2>
+        {notes.length===0 && 'No nots availables'}
         {notes.map((note) => {
           return (
             <Noteitem key={note._id} updateNote={updateNote} note={note} />
