@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; //useNavigate same as useHistory
-const Login = () => {
+const Login = (props) => {
     const [credentials,setCredentials]=useState({email:"",password:""});   
     let navigate = useNavigate();
 
@@ -18,10 +18,11 @@ const Login = () => {
         if(json.success){
             // Save the auth token and redirect
             localStorage.setItem('token',json.authtoken);
+            props.showAlert("Logged in successfully","success")
             navigate("/");
         }
         else{
-            alert("Invalid Credentials")
+            props.showAlert("Invalid Details","danger")
         }
     }
     const onChange=(e)=>{
